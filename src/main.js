@@ -9,7 +9,7 @@ import App from './App.vue'
 Vue.use(VueRouter)
 Vue.use(VueAxios, axios)
 
-axios.defaults.baseURL = 'https://api.the-odds-api.com/v3/';
+axios.defaults.baseURL = 'https://api.the-odds-api.com/v3';
 
 Vue.config.productionTip = false
 
