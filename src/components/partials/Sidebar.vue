@@ -7,15 +7,20 @@
       </div>
       <div class="sidebar-wrapper">
         <ul class="nav">
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/">
+          <li class="nav-item" v-bind:class="{ active: activeKey === 'home'}">
+            <router-link class="nav-link" v-on:click.native="setSelectedCategory('home')" to="/">
               <p>Home</p>
             </router-link>
           </li>
-          <li v-for="(sportCategory, index) in sportCategories" :key="index" class="nav-item">
-            <a class="nav-link" href="./dashboard.html">
+          <li class="nav-item nav-serach">
+              <div class="input-group no-border">
+                <input type="text" value="" class="form-control" v-model="searchQuery" placeholder="Search...">
+              </div>
+          </li>
+          <li v-for="(sportCategory, index) in filteredCategories" :key="index" class="nav-item" v-bind:class="{ active: activeKey == sportCategory.key}">
+            <router-link class="nav-link" v-on:click.native="setSelectedCategory(sportCategory.key)" :to="{ name: 'matches', params: {category: sportCategory.key}}">  
               <p>{{ sportCategory.title }} <small><br>{{ sportCategory.group }}</small></p>
-            </a>
+            </router-link>
           </li>
         </ul>
       </div>
@@ -23,30 +28,41 @@
 </template>
 
 <script>
-    import {RepositoryFactory} from '@/repositories/RepositoryFactory';
-    const StatisticRepository = RepositoryFactory.get('sports');
+import { RepositoryFactory } from '@/repositories/RepositoryFactory';
+const SportsRepository = RepositoryFactory.get('sports');
 
-    export default {
-        name: "Sidebar",
-        data() {
-            return {
-                sportCategories: [],
-                activeKey: 'home'
-            }
+export default {
+    name: "Sidebar",
+    data() {
+        return {
+            sportCategories: [],
+            activeKey: 'home',
+            searchQuery: ''
+        }
+    },
+    async created() {
+        if (this.$route.params.category) {
+            this.activeKey = this.$route.params.category;
+        }
+        await this.getSportCategories();
+    },
+    methods: {
+        setSelectedCategory(key) {
+            this.activeKey = key;
         },
-        async created() {
-            await this.getSportCategories();
+        async getSportCategories() {
+            const { data } = await SportsRepository.get();
+            this.sportCategories = data.data;
         },
-        methods: {
-           async getSportCategories() {
-                const {data} = await StatisticRepository.get();
-                this.sportCategories = data.data;
-                /* eslint-disable no-console */
-                console.log(this.sportCategories);
-                /* eslint-enable no-console */
-            },
+    },
+    computed: {
+        filteredCategories() {
+            return this.sportCategories.filter(category => {
+                return (category.title.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 || category.group.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1)
+            })
         }
     }
+}
 </script>
 
 <style scoped>

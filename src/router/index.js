@@ -12,15 +12,18 @@ const routes = [
     component: Home
   },
   {
-    path: '/matches',
+    path: '/matches/:category',
     name: 'matches',
-    component: Matches
+    component: Matches,
+    props: true
   },
 ]
 
 const router = new VueRouter({
     mode: 'history',
-    routes
+    routes,
+    linkActiveClass: "active", 
+    linkExactActiveClass: "active" 
 })
 
 export default router
