@@ -52,10 +52,8 @@ export default {
     props: ['category'],
     watch: {
         category: {
-            // the callback will be called immediately after the start of the observation
             immediate: true,
             async handler() {
-                this.matchesByCategory = [];
                 await this.getMatches();
             }
         }
@@ -79,6 +77,7 @@ export default {
             let tmpMatches;
             const { data } = await OddsRepository.get('&sport=' + this.category + '&region=eu');
             tmpMatches = data.data;
+            this.matchesByCategory = [];
             this.formatMatches(tmpMatches);
         },
         formatMatches(matches) {
